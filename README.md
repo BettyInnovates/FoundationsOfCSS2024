@@ -46,7 +46,7 @@ The course is organized in 13 sessions. Each session contains a practical part w
 7. **Cities and Complexity (19.11.2024) (guest lecture: TBC)**
 - Exercise 2: Social Impact Theory with Twitter Data (session 1) [[Video]](https://tube.tugraz.at/paella/ui/watch.html?id=b070baec-ca13-4fdf-9875-ec0ac895a30f) -- [[Exercise resources]](https://github.com/pjercic/FoundationsOfCSS2024/blob/main/Exercise02/)  
 
-8. **Collective intelligence and collective action (guest: Prof. Mirta Galesic, Santa Fe Institue and Complexity Science Hub Vienna)** [[Slides]](https://pjercic.github.io/FoundationsOfCSS2024/03_CollectiveIntelligenceAction/week-3.pdf) (26.11.2024)
+8. **Collective intelligence and collective action (guest: Prof. Mirta Galesic, Santa Fe Institue and Complexity Science Hub Vienna)** [[Slides]](https://github.com/pjercic/FoundationsOfCSS2024/blob/main/Lectures/week-8-2024.pdf) (26.11.2024)
 - Exercise 2: Social Impact Theory with Twitter Data (session 2) [[Video]](https://tube.tugraz.at/paella/ui/watch.html?id=b070baec-ca13-4fdf-9875-ec0ac895a30f) -- [[Exercise resources]](https://github.com/pjercic/FoundationsOfCSS2024/blob/main/Exercise02/)
   
 9. **Measuring Polarization (guest lecture: Dr. Samuel
