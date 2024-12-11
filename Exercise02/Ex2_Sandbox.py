@@ -12,6 +12,7 @@ import zipfile # added to open zip-file
 # Forbes top Twitter influencers
 # https://twitter.com/i/lists/100791150
 
+# Get list of users from csv
 users_list = pd.read_csv("users.csv")
 # users list
 
@@ -81,22 +82,29 @@ plt.show()
 fig1.savefig("histo_follower.png")
 
 
-# Distribution of social impact
+# Distribution of Average Number of Retweets (Social Impact)
 fig2, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6))
 fig2.suptitle('Distribution of Social Impact')
+# Original Social Impact
 ax1.hist(dataset["public_metrics.retweet_count"])
+ax1.set_title("Social Impact")
+ax1.set_xlabel("Average Number of Retweets (Social Impact)")
+ax1.set_ylabel("Number of Authors by Social Impact")
+# Social Impact Logarithmic
 ax2.hist(dataset["public_metrics.retweet_count"])
-# ax2.xscale('log')
+ax2.set_title("Social Impact Logarithmic")
+ax2.set_xlabel("Average Number of Retweets (Social Impact)")
+ax2.set_ylabel("Number of Authors by Social Impact (Log Scale)")
 ax2.set_yscale("log")
-# fig2.show()
+plt.show()
 fig2.savefig("histo_impact.png")
 
 # Number of followers vs social impact
 plt.figure(figsize=(10, 6))
 plt.scatter(dataset["public_metrics.followers_count"], dataset["public_metrics.retweet_count"], alpha=0.7)
 plt.title("Number of Followers vs Social Impact", fontsize=16)
-plt.xlabel("Number of Followers", fontsize=12)
-plt.ylabel("Social Impact", fontsize=12)
+plt.xlabel("Followers Count Logarithmic", fontsize=12)
+plt.ylabel("Social Impact Logarithmic", fontsize=12)
 plt.xscale("log")
 plt.yscale("log")
 plt.grid(True)
@@ -106,25 +114,23 @@ plt.show()
 # 4. Fit and visualize a regression model
 # ==========================================================
 
+# Add new Columns with logarithmic values
 dataset = dataset.assign(SI=np.log(dataset["public_metrics.retweet_count"]))
 dataset = dataset.assign(FC=np.log(dataset["public_metrics.followers_count"]))
 
 # target = dataset["SI"].values
 # features = dataset["FC"].values
 
-target = dataset["FC"].values
-features = dataset["SI"].values
+# Calculate Linear Regression
+target = dataset["SI"].values
+features = dataset["FC"].values
 
 target = target.reshape(len(target), 1)
 features = features.reshape(len(features), 1)
 
-print(target)
-print(features)
-
-
-reg = LinearRegression().fit(target, features)
+reg = LinearRegression().fit(features, target)
 # reg = LinearRegression().fit(features, target)
-reg_score = reg.score(target, features)
+reg_score = reg.score(features, target)
 reg_coef = reg.coef_[0][0]
 reg_intercept = reg.intercept_[0]
 print(f"R^2 Score: {reg_score:.3f}")
@@ -199,23 +205,39 @@ plt.grid(True)
 plt.show()
 """
 
-# X-Werte für die Regressionslinie
-xseq = np.linspace(dataset["FC"].min(), dataset["FC"].max(), num=100).reshape(-1, 1)  # Von 10^3 bis 10^7 (in der Originalskala)
-#xseq = np.exp(xseq_log)
-# Berechnung der Regressionslinie
-yseq = reg_coef * xseq.flatten() + reg_intercept  # Logarithmierte Vorhersage
-#yseq = np.exp(yseq_log)
-#yseq = [reg_coef * x for x in xseq]
-#yseq = [x + reg_intercept for x in yseq]
+# Calculate values for regression line
+xseq = np.linspace(dataset["FC"].min(), dataset["FC"].max(), num=100).reshape(-1, 1)
+yseq = reg_coef * xseq.flatten() + reg_intercept  # logarithmic prediction
 
-# Plot the results ohne log skala
+##################################################################
+# Plot Linear Regression - Log-Transformed Values on Linear Scales
+##################################################################
+
 plt.figure(figsize=(10, 6))
+
+# Scatter points
 plt.scatter(dataset["FC"], dataset["SI"], alpha=0.7)
-plt.title("Linear Regression: Number of Followers vs Social Impact", fontsize=16)
-plt.xlabel("Number of Followers", fontsize=12)
-plt.ylabel("Social Impact", fontsize=12)
-plt.plot(xseq, yseq, color="red", label="Regression line", linewidth=2)
-#plt.xscale("log")
-#plt.yscale("log")
+
+#sns.regplot(
+ #   x="FC", y="SI", data=dataset,
+  #  scatter_kws={"alpha": 0.7},
+ #   line_kws={"color": "green", "linewidth": 4, "label": "Seaborn Regression Line"},
+  #  ci=None
+#)
+
+# Manually calculated regression line
+plt.plot(xseq, yseq, color="red", label="Manually Calculated Regression Line", linewidth=2)
+
+plt.title("Linear Regression: Number of Followers vs Social Impact\n(Log-Transformed Values on Linear Scales)", fontsize=16)
+plt.xlabel("Log(Number of Followers)", fontsize=12)
+plt.ylabel("Log(Social Impact)", fontsize=12)
 plt.grid(True)
+plt.legend()
 plt.show()
+
+# Calculate quality of fit
+dataset = dataset.assign(SI_pred=reg.predict(dataset[["FC"]]))
+
+# Calculate predicted values (y_pred) using the model
+SI_pred = reg.predict(dataset[["FC"]])  # Predict SI based on log-transformed FC
+dataset = dataset.assign(residual=(dataset["SI"] - dataset["SI_pred"]))
